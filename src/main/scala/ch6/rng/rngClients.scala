@@ -8,11 +8,6 @@ object rngClients {
     (if (int < 0) -(int + 1) else int, nextRng)
   }
 
-  def double(rng: RNG): (Double, RNG) = {
-    val (int, nextRng) = nonNegativeInt(rng)
-    (int / (Int.MaxValue.toDouble + 1), nextRng)
-  }
-
   def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
     require(count >= 0)
     recursiveInts(count, rng, List.empty[Int])
