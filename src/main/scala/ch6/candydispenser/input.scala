@@ -1,4 +1,4 @@
-package candydispenser
+package ch6.candydispenser
 
 sealed trait Input
 case object Coin extends Input

@@ -1,4 +1,4 @@
-package candydispenser
+package ch6.candydispenser
 
 import org.scalatest.FunSpec
 
