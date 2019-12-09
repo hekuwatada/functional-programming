@@ -19,4 +19,6 @@ object rngSequence {
       recursiveSequence(acc ++ List(newA), hst, newRng)
     }
   }
+  
+  //TODO: implement sequence with fold on List
 }
