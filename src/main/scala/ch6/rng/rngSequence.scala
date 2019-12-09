@@ -6,6 +6,8 @@ import scala.annotation.tailrec
 
 object rngSequence {
 
+  type SequenceFn[A] = List[Rand[A]] => Rand[List[A]]
+
   // List[RNG => (A, RNG)] => RNG => (List[A], RNG)
   // combining a list of transitions into a single transition
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
