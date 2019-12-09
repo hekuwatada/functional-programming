@@ -33,4 +33,18 @@ class RNGSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAfte
       verifyNoInteractions(mockNextRng)
     }
   }
+
+  describe("map2()") {
+    it("returns RNG => (c, RNG) given RNG => (a, RNG), RNG => (b, RNG) and (a, b) => c") {
+      val nextRng1 = mock[RNG]
+      val nextRng2 = mock[RNG]
+
+      when(mockRng.nextInt).thenReturn((1, nextRng1))
+      when(nextRng1.nextInt).thenReturn((2, nextRng2))
+
+      val randC: Rand[Int] = RNG.map2(_.nextInt, _.nextInt)(_ + _)
+      randC(mockRng) shouldBe (3, nextRng2)
+      verifyNoInteractions(nextRng2)
+    }
+  }
 }
