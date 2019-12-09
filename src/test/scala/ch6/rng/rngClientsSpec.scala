@@ -1,7 +1,7 @@
 package ch6.rng
 
 import ch6.rng.rngClients._
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito._
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
 
@@ -11,7 +11,7 @@ class rngClientsSpec extends FunSpec with Matchers with BeforeAndAfter with Mock
   val newRng = mock[RNG]
 
   before {
-    reset(mockRng)
+    reset(mockRng, newRng)
   }
 
   describe("nonNegativeInt() - generates a random integer between 0 and Int.maxValue") {
@@ -70,6 +70,36 @@ class rngClientsSpec extends FunSpec with Matchers with BeforeAndAfter with Mock
 
     it("throws exception when negative size is given") {
       intercept[IllegalArgumentException] { ints(-1)(mockRng) }
+    }
+  }
+
+  describe("combinations") {
+    it("intDouble() generates ((Int, Double), RNG)") {
+      val nextRng1 = mock[RNG]
+      val nextRng2 = mock[RNG]
+
+      when(mockRng.nextInt).thenReturn((1, nextRng1))
+      when(nextRng1.nextInt).thenReturn((2, nextRng2))
+
+      val ((actualInt, actualDouble), actualRng) = intDouble(mockRng)
+      actualInt shouldBe 1
+      actualDouble shouldBe 2.0
+      actualRng shouldBe nextRng2
+      verifyNoInteractions(nextRng2)
+    }
+
+    it("doubleInt() generates ((Double, Int), RNG)") {
+      val nextRng1 = mock[RNG]
+      val nextRng2 = mock[RNG]
+
+      when(mockRng.nextInt).thenReturn((1, nextRng1))
+      when(nextRng1.nextInt).thenReturn((2, nextRng2))
+
+      val ((actualDouble, actualInt), actualRng) = doubleInt(mockRng)
+      actualInt shouldBe 2
+      actualDouble shouldBe 1.0
+      actualRng shouldBe nextRng2
+      verifyNoInteractions(nextRng2)
     }
   }
 }

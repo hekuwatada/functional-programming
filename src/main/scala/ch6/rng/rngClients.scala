@@ -1,5 +1,7 @@
 package ch6.rng
 
+import ch6.rng.RNG.Rand
+
 import scala.annotation.tailrec
 
 object rngClients {
@@ -21,4 +23,14 @@ object rngClients {
       recursiveInts(count, newRng, acc ++ List(newInt)) // if order does not matter, do newInt :: acc
     }
   }
+
+  def both[A, B](sa: Rand[A], sb: Rand[B]): Rand[(A, B)] =
+    RNG.map2(sa, sb)((a, b) => (a, b))
+
+  def intDouble(rng: RNG): ((Int, Double), RNG) = both(_.nextInt, nextDouble)(rng)
+
+  def doubleInt(rng: RNG): ((Double, Int), RNG) = both(nextDouble, _.nextInt)(rng)
+
+  private def nextDouble(rng: RNG): (Double, RNG) =
+    RNG.map(_.nextInt)(_.toDouble)(rng)
 }
