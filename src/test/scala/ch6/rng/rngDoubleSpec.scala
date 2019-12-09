@@ -11,11 +11,15 @@ class rngDoubleSpec extends FunSpec with Matchers with BeforeAndAfter with Mocki
   val newRng = mock[RNG]
 
   before {
-    reset(mockRng)
+    reset(mockRng, newRng)
   }
 
   describe("double() - generates a Double between 0 and 1 (exclusive)") {
     testDouble(double)
+  }
+
+  describe("doubleWithMap() - generates a Double between 0 and 1 (exclusive)") {
+    testDouble(doubleWithMap)
   }
 
   private def testDouble(doubleFnUnderTest: (RNG) => (Double, RNG)): Unit = {
