@@ -22,4 +22,11 @@ object RNG {
     val (b, rngB) = sb(rngA)
     (f(a, b), rngB)
   }
+
+  //TODO: [6.8] implement flatMap
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = ???
+
+  //TODO: [6.8] use flatMap to implement nonNegativeLessThan
+
+  //TODO: [6.9] Re-implement map and map2 in terms of flatMap
 }
