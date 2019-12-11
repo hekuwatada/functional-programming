@@ -1,5 +1,7 @@
 package ch6.rng
 
+import ch6.rng.RNG.Rand
+
 import scala.annotation.tailrec
 
 object rngInt {
@@ -18,8 +20,13 @@ object rngInt {
     }
   }
 
-  // TODO: reimplement ints with sequence and List.fill
   // def sequenceWithFoldRightMap2[A](fs: List[Rand[A]]): Rand[List[A]]
   // use List.fill(n)(x) -- make a list with x repeated n times
-  def intsWithSequence(count: Int)(rng: RNG): (List[Int], RNG) = ???
+  // type Rand[+A] = RNG => (A, RNG)
+  def intsWithSequence(count: Int)(rng: RNG): (List[Int], RNG) = {
+    require(count >= 0)
+    val randsInt: List[Rand[Int]] = List.fill(count)(RNG.int)
+    val randIntList: Rand[List[Int]] = rngSequence.sequenceWithFoldRightMap2(randsInt)
+    randIntList(rng)
+  }
 }
