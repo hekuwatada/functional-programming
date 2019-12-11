@@ -47,4 +47,20 @@ class RNGSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAfte
       verifyNoInteractions(nextRng2)
     }
   }
+
+  // flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B]
+  describe("flatMap()") {
+    it("returns Rand[B] given Rand[A] and A => Rand[B] where B is Double and A is Int") {
+      val nextRng1 = mock[RNG]
+      val nextRng2 = mock[RNG]
+
+      when(mockRng.nextInt).thenReturn((1, nextRng1))
+      when(nextRng1.nextInt).thenReturn((5, nextRng2))
+
+      val randDouble = RNG.flatMap(RNG.int)(_ => RNG.double)
+
+      randDouble(mockRng) shouldBe (5.0, nextRng2)
+      verifyNoInteractions(nextRng2)
+    }
+  }
 }
