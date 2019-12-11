@@ -32,4 +32,12 @@ object rngSequence {
       (accListA ++ List(newA), newRng)
     })
   }
+
+  // map2[A, B, C](sa: Rand[A], sb: Rand[B])(f: (A, B) => C): Rand[C]
+  // A = B = C = List[X]
+  // foldRight[B](z: B)(op: (A, B) => B): B
+  // B = A = Rand[List[X]]
+  def sequenceWithFoldRightMap2[A](fs: List[Rand[A]]): Rand[List[A]] =
+    fs.foldRight(RNG.unit(List.empty[A]))((rand, acc) => RNG.map2(rand, acc)(_ :: _))
+
 }
