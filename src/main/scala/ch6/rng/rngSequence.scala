@@ -34,15 +34,16 @@ object rngSequence {
   }
 
   // map2[A, B, C](sa: Rand[A], sb: Rand[B])(f: (A, B) => C): Rand[C]
-  // A = B = C = List[X]
+  // A = X
+  // B = C = List[X]
   // foldRight[B](z: B)(op: (A, B) => B): B
   // B = Rand[List[X]]
-  // A = X
+  // A = Rand[X]
   def sequenceWithFoldRightMap2[A](fs: List[Rand[A]]): Rand[List[A]] =
-    fs.foldRight(RNG.unit(List.empty[A]))((rand, acc) => RNG.map2(rand, acc)(_ :: _))
+    fs.foldRight(RNG.unit(List.empty[A]))((rand: Rand[A], acc: Rand[List[A]]) => RNG.map2(rand, acc)(_ :: _))
 
   // foldLeft[B](z: B)(op: (B, A) => B): B
   def sequenceWithFoldLeftMap2[A](fs: List[Rand[A]]): Rand[List[A]] =
-    fs.foldLeft(RNG.unit(List.empty[A]))((acc, rand) => RNG.map2(acc, rand)((a: List[A], b: A) => a ++ List(b)))
+    fs.foldLeft(RNG.unit(List.empty[A]))((acc: Rand[List[A]], rand: Rand[A]) => RNG.map2(acc, rand)(_ ++ List(_)))
 
 }
