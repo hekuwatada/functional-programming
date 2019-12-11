@@ -20,9 +20,10 @@ class rngSequenceSpec extends FunSpec with Matchers with BeforeAndAfter with Moc
     }
   }
 
-  describe("sequence() with foldRight()") {
-    pending
-    withFn[Int](sequenceWithFoldRight)(testSequenceInt)
+  describe("sequence() with foldLeft()") {
+    it("combines a list of transitions into a single transition") {
+      withFn[Int](sequenceWithFoldLeft)(testSequenceInt)
+    }
   }
 
   private def withFn[A](sequenceFnUnderTest: SequenceFn[A])(testBlock: (SequenceFn[A]) => Unit): Unit = testBlock(sequenceFnUnderTest)
