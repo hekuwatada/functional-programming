@@ -21,6 +21,15 @@ object rngSequence {
       recursiveSequence(acc ++ List(newA), hst, newRng)
     }
   }
-  
-  //TODO: implement sequence with fold on List
+
+  // foldRight[B](z: B)(op: (A, B) => B): B
+  // B = (List[A], RNG)
+  // A = RNG => (A, RNG)
+  def sequenceWithFoldRight[A](fs: List[Rand[A]]): Rand[List[A]] = {
+    rng => fs.foldRight((List.empty[A], rng))((randA: Rand[A], acc: (List[A], RNG)) => {
+      val (accListA: List[A], accRng: RNG) = acc
+      val (newA: A, newRng: RNG) = randA(accRng)
+      (accListA ++ List(newA), newRng)
+    })
+  }
 }

@@ -22,7 +22,7 @@ class rngSequenceSpec extends FunSpec with Matchers with BeforeAndAfter with Moc
 
   describe("sequence() with foldRight()") {
     pending
-//    withFn[Int](sequenceWithFoldRight)(testSequenceInt)
+    withFn[Int](sequenceWithFoldRight)(testSequenceInt)
   }
 
   private def withFn[A](sequenceFnUnderTest: SequenceFn[A])(testBlock: (SequenceFn[A]) => Unit): Unit = testBlock(sequenceFnUnderTest)
