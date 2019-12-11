@@ -18,6 +18,10 @@ class rngIntSpec extends FunSpec with Matchers with BeforeAndAfter with MockitoS
     testInts(ints)
   }
 
+  describe("intWithSequence() - generates a list of random integers") {
+    testInts(intsWithSequence)
+  }
+
   def testInts(intsFn: (Int) => (RNG) => (List[Int], RNG)): Unit = {
     it("returns empty list when size zero is given") {
       val (actualList, actualRng) = intsFn(0)(mockRng)

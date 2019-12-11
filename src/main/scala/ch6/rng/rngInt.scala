@@ -17,4 +17,9 @@ object rngInt {
       recursiveInts(count, newRng, acc ++ List(newInt)) // if order does not matter, do newInt :: acc
     }
   }
+
+  // TODO: reimplement ints with sequence and List.fill
+  // def sequenceWithFoldRightMap2[A](fs: List[Rand[A]]): Rand[List[A]]
+  // use List.fill(n)(x) -- make a list with x repeated n times
+  def intsWithSequence(count: Int)(rng: RNG): (List[Int], RNG) = ???
 }
