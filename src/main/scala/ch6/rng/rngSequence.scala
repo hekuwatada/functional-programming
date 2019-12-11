@@ -11,7 +11,7 @@ object rngSequence {
   // List[RNG => (A, RNG)] => RNG => (List[A], RNG)
   // combining a list of transitions into a single transition
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
-    rng => recursiveSequence((List.empty[A], rng), fs)
+    rng => recursiveSequence(RNG.unit(List.empty[A])(rng), fs)
 
   @tailrec
   private def recursiveSequence[A](acc: (List[A], RNG), fs: List[Rand[A]]): (List[A], RNG) = fs match {
@@ -26,7 +26,7 @@ object rngSequence {
   // B = (List[A], RNG)
   // A = RNG => (A, RNG)
   def sequenceWithFoldRight[A](fs: List[Rand[A]]): Rand[List[A]] = {
-    rng => fs.foldRight((List.empty[A], rng))((randA: Rand[A], acc: (List[A], RNG)) => {
+    rng => fs.foldRight(RNG.unit(List.empty[A])(rng))((randA: Rand[A], acc: (List[A], RNG)) => {
       val (accListA: List[A], accRng: RNG) = acc
       val (newA: A, newRng: RNG) = randA(accRng)
       (accListA ++ List(newA), newRng)
