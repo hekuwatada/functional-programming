@@ -5,17 +5,20 @@ trait RNG {
 }
 
 object RNG {
+  // state action that transforms state of RNG
   type Rand[+A] = RNG => (A, RNG)
 
   val int: Rand[Int] = _.nextInt
 
+  val double: Rand[Double] = map(_.nextInt)(_.toDouble)
+
+  // passing through a state without changes; returning a constant value
   def unit[A](a: A): Rand[A] = rng => (a, rng)
 
-  def map[A, B](s: Rand[A])(f: A => B): Rand[B] =
-    rng => {
-      val (a, nextRng) = s(rng)
-      (f(a), nextRng)
-    }
+  def map[A, B](s: Rand[A])(f: A => B): Rand[B] = rng => {
+    val (a, nextRng) = s(rng)
+    (f(a), nextRng)
+  }
 
   def map2[A, B, C](sa: Rand[A], sb: Rand[B])(f: (A, B) => C): Rand[C] = rng => {
     val (a, rngA) = sa(rng)
