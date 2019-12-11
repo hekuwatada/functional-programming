@@ -11,15 +11,15 @@ object rngSequence {
   // List[RNG => (A, RNG)] => RNG => (List[A], RNG)
   // combining a list of transitions into a single transition
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
-    rng => recursiveSequence(List.empty[A], fs, rng)
+    rng => recursiveSequence((List.empty[A], rng), fs)
 
   @tailrec
-  private def recursiveSequence[A](acc: List[A], fs: List[Rand[A]], rng: RNG): (List[A], RNG) = fs match {
-    case Nil => (acc, rng)
-    case hsh::hst => {
-      val (newA, newRng) = hsh(rng)
-      recursiveSequence(acc ++ List(newA), hst, newRng)
-    }
+  private def recursiveSequence[A](acc: (List[A], RNG), fs: List[Rand[A]]): (List[A], RNG) = fs match {
+    case Nil => acc
+    case randA::tail =>
+      val (accListA, accRng) = acc
+      val (newA, newRng) = randA(accRng)
+      recursiveSequence((accListA ++ List(newA), newRng), tail)
   }
 
   // foldRight[B](z: B)(op: (A, B) => B): B
