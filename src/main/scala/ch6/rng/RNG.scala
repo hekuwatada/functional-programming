@@ -8,6 +8,8 @@ object RNG {
   // state action that transforms state of RNG
   type Rand[+A] = RNG => (A, RNG)
 
+  type MapFn[A, B] = Rand[A] => (A => B) => Rand[B] //TODO: type variance
+
   val int: Rand[Int] = _.nextInt
 
   val double: Rand[Double] = map(_.nextInt)(_.toDouble)
