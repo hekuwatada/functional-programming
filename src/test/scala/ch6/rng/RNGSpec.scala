@@ -25,6 +25,10 @@ class RNGSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAfte
     withMap[Int, Double](RNG.map)(testMapIntDouble)
   }
 
+  describe("mapWithFlatMap()") {
+    withMap[Int, Double](RNG.mapWithFlatMap)(testMapIntDouble)
+  }
+
   describe("map2()") {
     testMap2(RNG.map2)
   }
