@@ -7,7 +7,9 @@ case class State[S, +A](run: S => (A, S)) {
     f(a).run(nextS)
   })
 
-  // TODO: implement map, map2, flatMap
+  def map[B](f: A => B): State[S, B] = flatMap(f.andThen(State.unit))
+
+  // TODO: implement map2
 }
 
 object State {

@@ -7,9 +7,12 @@ import org.scalatestplus.mockito.MockitoSugar
 
 class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAfter {
   val rng = mock[RNG]
+  val nextRng = mock[RNG]
+
+  val intRng = State[RNG, Int](_.nextInt)
 
   before {
-    reset(rng)
+    reset(rng, nextRng)
   }
 
   describe("unit()") {
@@ -27,13 +30,21 @@ class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAf
       when(rng.nextInt).thenReturn((1, nextRng1))
       when(nextRng1.nextInt).thenReturn((2, nextRng2))
 
-      val state = State[RNG, Int](_.nextInt)
       val f: Int => State[RNG, Double] = i => State(s => {
         val (newInt, newS) = s.nextInt
         (i.toDouble + newInt, newS)
       })
-      state.flatMap(f).run(rng) shouldBe (3.0, nextRng2)
+      intRng.flatMap(f).run(rng) shouldBe (3.0, nextRng2)
       verifyNoInteractions(nextRng2)
+    }
+  }
+
+  describe("map()") {
+    it("returns State[S, B] given A => B") {
+      when(rng.nextInt).thenReturn((2, nextRng))
+
+      intRng.map(_.toString).run(rng) shouldBe ("2", nextRng)
+      verifyNoInteractions(nextRng)
     }
   }
 }
