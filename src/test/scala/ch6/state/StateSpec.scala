@@ -10,6 +10,10 @@ class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAf
   val nextRng = mock[RNG]
 
   val intRng = State[RNG, Int](_.nextInt)
+  val doubleRng = State[RNG, Double]({ s =>
+    val (newInt, newS) = s.nextInt
+    (newInt.toDouble, newS)
+  })
 
   before {
     reset(rng, nextRng)
@@ -45,6 +49,19 @@ class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAf
 
       intRng.map(_.toString).run(rng) shouldBe ("2", nextRng)
       verifyNoInteractions(nextRng)
+    }
+  }
+
+  describe("map2()") {
+    it("returns State[S, C] given State[S, B] and (A, B) => C") {
+      val nextRng1 = mock[RNG]
+      val nextRng2 = mock[RNG]
+
+      when(rng.nextInt).thenReturn((1, nextRng1))
+      when(nextRng1.nextInt).thenReturn((2, nextRng2))
+
+      intRng.map2(doubleRng)((i, d) => (i + d).toString).run(rng) shouldBe ("3.0", nextRng2)
+      verifyNoInteractions(nextRng2)
     }
   }
 }

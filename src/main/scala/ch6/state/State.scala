@@ -9,7 +9,11 @@ case class State[S, +A](run: S => (A, S)) {
 
   def map[B](f: A => B): State[S, B] = flatMap(f.andThen(State.unit))
 
-  // TODO: implement map2
+  def map2[B, C](sb: State[S, B])(f: (A, B) => C): State[S, C] = State({ s =>
+    val (a, nextAS) = run(s)
+    val (b, nextBS) = sb.run(nextAS)
+    (f(a, b), nextBS)
+  })
 }
 
 object State {
