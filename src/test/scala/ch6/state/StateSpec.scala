@@ -1,6 +1,7 @@
 package ch6.state
 
 import ch6.rng.RNG
+import ch6.state.State.Map2Fn
 import org.mockito.Mockito._
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
@@ -54,14 +55,25 @@ class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAf
 
   describe("map2()") {
     it("returns State[S, C] given State[S, B] and (A, B) => C") {
-      val nextRng1 = mock[RNG]
-      val nextRng2 = mock[RNG]
-
-      when(rng.nextInt).thenReturn((1, nextRng1))
-      when(nextRng1.nextInt).thenReturn((2, nextRng2))
-
-      intRng.map2(doubleRng)((i, d) => (i + d).toString).run(rng) shouldBe ("3.0", nextRng2)
-      verifyNoInteractions(nextRng2)
+      testMap2WithRngDoublePlusString(intRng.map2)
     }
+  }
+
+  describe("map2WithFlatMapMap()") {
+    it("returns State[S, C] given State[S, B] and (A, B) => C") {
+      testMap2WithRngDoublePlusString(intRng.map2WithFlatMapMap)
+    }
+  }
+
+  //  type Map2Fn[A, B, C, S] = State[S, B] => ((A, B) => C) => State[S, C]
+  private def testMap2WithRngDoublePlusString(map2Fn: Map2Fn[Int, Double, String, RNG]) {
+    val nextRng1 = mock[RNG]
+    val nextRng2 = mock[RNG]
+
+    when(rng.nextInt).thenReturn((1, nextRng1))
+    when(nextRng1.nextInt).thenReturn((2, nextRng2))
+
+    map2Fn(doubleRng)((i, d) => (i + d).toString).run(rng) shouldBe ("3.0", nextRng2)
+    verifyNoInteractions(nextRng2)
   }
 }

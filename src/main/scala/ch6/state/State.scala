@@ -9,19 +9,21 @@ case class State[S, +A](run: S => (A, S)) {
 
   def map[B](f: A => B): State[S, B] = flatMap(f.andThen(State.unit))
 
-  // flatMap[B](f: A => State[S, B]): State[S, B]
-  // map[B](f: A => B): State[S, B]
-  //TODO: implement map2() in terms of flatMap() and map()
   def map2[B, C](sb: State[S, B])(f: (A, B) => C): State[S, C] = State({ s =>
     val (a, nextAS) = run(s)
     val (b, nextBS) = sb.run(nextAS)
     (f(a, b), nextBS)
   })
 
+  def map2WithFlatMapMap[B, C](sb: State[S, B])(f: (A, B) => C): State[S, C] =
+    flatMap({ a => sb.map(b => f(a, b)) })
+
   def modify(f: S => S): State[S, Unit] = ???
 }
 
 object State {
+  type Map2Fn[A, B, C, S] = State[S, B] => ((A, B) => C) => State[S, C]
+
   def unit[S, A](a: A): State[S, A] = State(s => (a, s))
 }
 
