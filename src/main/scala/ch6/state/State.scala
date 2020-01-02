@@ -24,7 +24,12 @@ case class State[S, +A](run: S => (A, S)) {
 object State {
   type Map2Fn[A, B, C, S] = State[S, B] => ((A, B) => C) => State[S, C]
 
+  type SequenceFn[A, S] = List[State[S, A]] => State[S, List[A]]
+
   def unit[S, A](a: A): State[S, A] = State(s => (a, s))
+
+  def sequence[S, A](sas: List[State[S, A]]): State[S, List[A]] =
+    sas.foldRight(unit[S, List[A]](List.empty[A]))((acc, sa) => acc.map2(sa)(_ :: _))
 }
 
 //TODO: [6.12a] write flatMap x 2 + map x 1 => for comprehension

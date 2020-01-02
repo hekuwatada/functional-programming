@@ -65,6 +65,12 @@ class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAf
     }
   }
 
+  describe("sequence()") {
+    it("combines a list of transitions into a single transition") {
+      testSequenceInt(State.sequence)
+    }
+  }
+
   //  type Map2Fn[A, B, C, S] = State[S, B] => ((A, B) => C) => State[S, C]
   private def testMap2WithRngDoublePlusString(map2Fn: Map2Fn[Int, Double, String, RNG]) {
     val nextRng1 = mock[RNG]
@@ -75,5 +81,22 @@ class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAf
 
     map2Fn(doubleRng)((i, d) => (i + d).toString).run(rng) shouldBe ("3.0", nextRng2)
     verifyNoInteractions(nextRng2)
+  }
+
+  private def testSequenceInt(sequenceFn: State.SequenceFn[Int, RNG]): Unit = {
+    val mockRng = mock[RNG]
+    val nextRng1 = mock[RNG]
+    val nextRng2 = mock[RNG]
+    val nextRng3 = mock[RNG]
+
+    val nextIntPlusOne: State[RNG, Int] = intRng.map(_ + 1)
+    when(mockRng.nextInt).thenReturn((1, nextRng1))
+    when(nextRng1.nextInt).thenReturn((2, nextRng2))
+    when(nextRng2.nextInt).thenReturn((9, nextRng3))
+
+    val (actualList, actualRng) = sequenceFn(List(intRng, nextIntPlusOne, intRng)).run(mockRng)
+    actualList shouldBe List(1, 3, 9)
+    actualRng shouldBe nextRng3
+    verifyNoInteractions(nextRng3)
   }
 }

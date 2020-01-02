@@ -7,12 +7,6 @@ import org.scalatestplus.mockito.MockitoSugar
 
 class rngSequenceSpec extends FunSpec with Matchers with BeforeAndAfter with MockitoSugar {
 
-  val mockRng = mock[RNG]
-
-  before {
-    reset(mockRng)
-  }
-
   // List[RNG => (A, RNG)] => RNG => (List[A], RNG)
   describe("sequence()") {
     it("combines a list of transitions into a single transition") {
@@ -41,6 +35,7 @@ class rngSequenceSpec extends FunSpec with Matchers with BeforeAndAfter with Moc
   private def withFn[A](sequenceFnUnderTest: SequenceFn[A])(testBlock: (SequenceFn[A]) => Unit): Unit = testBlock(sequenceFnUnderTest)
 
   private def testSequenceInt(sequenceFn: SequenceFn[Int]): Unit = {
+    val mockRng = mock[RNG]
     val nextRng1 = mock[RNG]
     val nextRng2 = mock[RNG]
 
