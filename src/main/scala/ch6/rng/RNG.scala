@@ -6,6 +6,7 @@ trait RNG {
 
 object RNG {
   // state action that transforms state of RNG
+  //TODO: make Rand[A] type alias to State[A, RNG]
   type Rand[+A] = RNG => (A, RNG)
 
   type MapFn[A, B] = Rand[A] => (A => B) => Rand[B] //TODO: type variance
@@ -40,4 +41,7 @@ object RNG {
   //TODO: [6.8] use flatMap to implement nonNegativeLessThan
 
   //TODO: [6.9] Re-implement map and map2 in terms of flatMap
+
+  //TODO: EXERCISE 4: Write a function to generate a list of random integers.
+  def ints(count: Int)(rng: RNG): (List[Int], RNG) = ???
 }

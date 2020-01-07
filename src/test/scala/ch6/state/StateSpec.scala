@@ -1,6 +1,7 @@
 package ch6.state
 
-import ch6.rng.RNG
+import ch6.rng.RNG.Rand
+import ch6.rng.{RNG, rngInt, rngSequence}
 import ch6.state.State.Map2Fn
 import org.mockito.Mockito._
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
@@ -15,6 +16,12 @@ class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAf
     val (newInt, newS) = s.nextInt
     (newInt.toDouble, newS)
   })
+
+  def ints(count: Int): State[RNG, List[Int]] = {
+    require(count >= 0)
+    val randsInt: List[State[RNG, Int]] = List.fill(count)(intRng)
+    State.sequence(randsInt)
+  }
 
   before {
     reset(rng, nextRng)
@@ -71,6 +78,53 @@ class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAf
     }
   }
 
+  describe("for comprehension") {
+    it("returns a list of integers - flatMap & map") {
+      val stateAction: State[RNG, List[Int]] = intRng.flatMap { x =>
+        intRng.flatMap { y =>
+          ints(x).map { xs =>
+            xs.map { z =>
+              z % y
+            }
+          }
+        }
+      }
+
+      testGeneratingIntegers(stateAction)
+    }
+
+    it("returns a list of integers - for comprehension") {
+      val stateAction: State[RNG, List[Int]] = intRng.flatMap { x =>
+        intRng.flatMap { y =>
+          ints(x).map { xs =>
+            xs.map { z =>
+              z % y
+            }
+          }
+        }
+      }
+
+      testGeneratingIntegers(stateAction)
+    }
+  }
+
+  private def testGeneratingIntegers(stateActionUnderTest: State[RNG, List[Int]]): Unit = {
+    val nextRng1 = mock[RNG]
+    val nextRng2 = mock[RNG]
+    val nextRng3 = mock[RNG]
+    val nextRng4 = mock[RNG]
+
+    when(rng.nextInt).thenReturn((2, nextRng1))
+    when(nextRng1.nextInt).thenReturn((10, nextRng2))
+    when(nextRng2.nextInt).thenReturn((15, nextRng3))
+    when(nextRng3.nextInt).thenReturn((7, nextRng4))
+
+    val (actualInts, actualRng) = stateActionUnderTest.run(rng)
+
+    actualRng shouldBe nextRng4
+    actualInts shouldBe List(5, 7)
+    verifyNoInteractions(nextRng4)
+  }
   //  type Map2Fn[A, B, C, S] = State[S, B] => ((A, B) => C) => State[S, C]
   private def testMap2WithRngDoublePlusString(map2Fn: Map2Fn[Int, Double, String, RNG]) {
     val nextRng1 = mock[RNG]
