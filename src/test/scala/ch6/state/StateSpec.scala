@@ -94,14 +94,12 @@ class StateSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAf
     }
 
     it("returns a list of integers - for comprehension") {
-      val stateAction: State[RNG, List[Int]] = intRng.flatMap { x =>
-        intRng.flatMap { y =>
-          ints(x).map { xs =>
-            xs.map { z =>
-              z % y
-            }
-          }
-        }
+      val stateAction: State[RNG, List[Int]] = for {
+        x <- intRng
+        y <- intRng
+        xs <- ints(x)
+      } yield {
+        xs.map(_ % y)
       }
 
       testGeneratingIntegers(stateAction)
